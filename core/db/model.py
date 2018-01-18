@@ -27,23 +27,23 @@ __all__ = [
 
 
 class UserModel(SqlAlchemyORM):
-	table = UserEntity
+    table = UserEntity
 
-	@classmethod
-	def fetch_user_data(cls, session, mode='all', **kwargs):
-		modes = ('all', 'one', )
-		if mode not in modes:
-			raise Exception("Argument mode is not one among {}".format(modes))
+    @classmethod
+    def fetch_user_data(cls, session, mode='all', **kwargs):
+        modes = ('all', 'one', )
+        if mode not in modes:
+            raise Exception("Argument mode is not one among {}".format(modes))
 
-		if mode == 'all':
-			return cls.fetch(session, **kwargs)
-		elif mode == 'one':
-			return cls.fetch_one(session, **kwargs)
+        if mode == 'all':
+            return cls.fetch(session, **kwargs)
+        elif mode == 'one':
+            return cls.fetch_one(session, **kwargs)
 
-	@classmethod
-	def user_exists(cls, session, **kwargs):
-		return True if cls.fetch(session, **kwargs) else False
+    @classmethod
+    def user_exists(cls, session, **kwargs):
+        return True if cls.fetch(session, **kwargs) else False
 
-	@classmethod
-	def create_new_user(cls, session, **kwargs):
-		return cls.insert(session, **kwargs)
+    @classmethod
+    def create_new_user(cls, session, **kwargs):
+        return cls.insert(session, **kwargs)

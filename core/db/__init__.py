@@ -28,24 +28,24 @@ __all__ = [
 
 
 def create_session():
-	"""."""
-	# application starts
-	Session = sessionmaker()
-	conn = sqlite3.connect('example.db')
+    """."""
+    # application starts
+    Session = sessionmaker()
+    conn = sqlite3.connect('example.db')
 
-	#c = conn.cursor()
-	# Create table
-	#c.execute('''CREATE TABLE user (id number, username text, password text)''')
-	#c.execute('''insert into user (id, username, password) values (1, 'admin', 'admin')''')
-	#ss = c.execute('''select * from user''')
+    #c = conn.cursor()
+    # Create table
+    #c.execute('''CREATE TABLE user (id number, username text, password text)''')
+    #c.execute('''insert into user (id, username, password) values (1, 'admin', 'admin')''')
+    #ss = c.execute('''select * from user''')
 
-	#import pdb; pdb.set_trace() ## XXX: Remove This
+    #import pdb; pdb.set_trace() ## XXX: Remove This
 
-	# ... later
-	engine = create_engine('sqlite:///example.db')
-	Session.configure(bind=engine)
+    # ... later
+    engine = create_engine('sqlite:///example.db')
+    Session.configure(bind=engine)
 
-	session = Session()
+    session = Session()
 
-	#session.execute('''insert into user (id, user, passwd) values (1, 'siva', 'sri')''')
-	return session
+    #session.execute('''insert into user (id, user, passwd) values (1, 'siva', 'sri')''')
+    return session

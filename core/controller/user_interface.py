@@ -24,7 +24,7 @@ from core.api.user import authenticate_user, create_user
  
 @app.get('/loginvalidation', method='POST')
 def on_login():
-	return authenticate_user()
+    return authenticate_user()
 
 @app.get('/createUser', method='POST')
 def on_create_user():
