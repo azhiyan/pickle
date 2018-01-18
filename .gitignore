@@ -4,4 +4,6 @@ bin/
 lib64
 pip-selfcheck.json
 
+*.pyc
 
+core/configs/client.ini
