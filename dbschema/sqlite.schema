@@ -1,0 +1,19 @@
+--
+-- Sqlite based Schema
+--
+
+-- Create USER table
+CREATE TABLE user (
+    user_idn INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    first_name varchar(25) NOT NULL,
+    last_name varchar(25),
+    user_name varchar(25) NOT NULL,
+    hash1 VARCHAR(64) NOT NULL,
+    hash2 VARCHAR(64),
+    phone_no1 number NOT NULL,
+    phone_no2 number,
+    email_id varchar(50),
+    crt_dt DATETIME,
+    upd_dt DATETIME,
+    is_active number(1) DEFAULT 1
+)
