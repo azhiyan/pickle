@@ -4,6 +4,9 @@ bin/
 lib64
 pip-selfcheck.json
 
+*.db
+*.sqlite
+
 *.pyc
 
 core/configs/client.ini
