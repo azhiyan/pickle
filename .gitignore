@@ -1,12 +1,16 @@
 lib/
 include/
 bin/
+downloads/
+eggs/
+parts/
 share/
 lib64
 pip-selfcheck.json
 
 *.db
 *.sqlite
+.installed.cfg
 
 *.pyc
 
