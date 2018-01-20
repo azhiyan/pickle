@@ -4,6 +4,10 @@ PYTHON_VERSION=2.7.14
 PYTHON_DIR=Python-${PYTHON_VERSION}
 PYTHON_TAR=${PYTHON_DIR}.tar.xz
 
+SETUPTOOLS_VERSION=38.4.0
+SETUPTOOLS_DIR=setuptools-${SETUPTOOLS_VERSION}
+SETUPTOOLS_ZIP=${SETUPTOOLS_DIR}.zip
+
 VIRTUALENV_VERSION=15.1.0
 VIRTUALENV_DIR=virtualenv-${VIRTUALENV_VERSION}
 VIRTUALENV_TAR=${VIRTUALENV_DIR}.tar.gz
@@ -53,6 +57,23 @@ install_python() {
     cd_home
 }
 
+install_setuptools() {
+    rm_dir_if_exists ${DEP_DIR}/${SETUPTOOLS_DIR}
+
+    cd ${DEP_DIR}
+
+    unzip ${SETUPTOOLS_ZIP}
+
+    cd ${SETUPTOOLS_DIR}
+
+    ${HOME_DIR}/bin/python setup.py install
+
+    cd_home
+
+    rm_dir_if_exists ${DEP_DIR}/${SETUPTOOLS_DIR}
+
+}
+
 install_virtualenv() {
     rm_dir_if_exists ${DEP_DIR}/${VIRTUALENV_DIR}
 
@@ -90,6 +111,7 @@ install_zc_buildout() {
 }
 
 install_python
+install_setuptools
 install_virtualenv
 install_pip
 install_zc_buildout
