@@ -1,6 +1,7 @@
 lib/
 include/
 bin/
+share/
 lib64
 pip-selfcheck.json
 
