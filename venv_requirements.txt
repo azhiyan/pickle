@@ -1,4 +1,0 @@
-sqlalchemy
-simplejson
-bottle
-sqlite3
