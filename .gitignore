@@ -2,6 +2,8 @@ lib/
 include/
 bin/
 downloads/
+develop-eggs/
+src/
 eggs/
 parts/
 share/
@@ -11,6 +13,7 @@ pip-selfcheck.json
 *.db
 *.sqlite
 .installed.cfg
+.mr.developer.cfg
 
 *.pyc
 
