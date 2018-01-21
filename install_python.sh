@@ -28,9 +28,12 @@ cd_home() {
 }
 
 rm_dir_if_exists() {
+    echo -ne "Cleaning up" $1 "... "
     if [ -d $1 ]; then
-        echo "cleaning up" $1
+        echo "completed"
         rm -rf $1
+    else
+        echo "skipped, dir not found"
     fi
 }
 
@@ -41,15 +44,16 @@ install_python() {
 
     cd ${DEP_DIR}/${PYTHON_DIR}
 
+    echo -ne "Trying to install " ${PYTHON_DIR} "... "
     if [ -f "${HOME_DIR}/bin/python" ]; then
-        echo "WARN: Python is already installed as ./bin/python"
+        echo "Python is already installed."
     else
         # "make clean" may be necessary here for earlier versions
         ./configure --prefix=`pwd`/../../ --enable-unicode=ucs4
         make
         make install
 
-        echo "INFO: Python is successfully installed as ./bin/python"
+        echo "installation completed."
     fi
 
     rm_dir_if_exists ${DEP_DIR}/${PYTHON_DIR}
