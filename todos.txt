@@ -1,0 +1,14 @@
+
+TASK ID | VERSION	| STATUS	| DESCRIPTION
+----------------------------------------------
+10001	| 1.0.0		| INPR		| User Session Management System
+10002	| 1.0.0		| INPR		| User Activity Management System
+10003	| 1.0.0		| TODO		| Logout Functionality
+10004	| 1.0.0		| TODO		| Add User Roles
+10005	| 1.0.0		| TODO		| User Role based access to API
+10006	| 1.0.0		| INPR		| DB preparation by automation
+10007	| 1.0.0		| TODO		| Isolate product repos (DB, Utils, Controller, UI)
+10008	| 1.0.0		| TODO		| SetUp Package Server
+10009	| 1.0.0		| TODO		| Scheduler UI
+10010	| 1.0.0		| TODO		| Scheduler Basckend for Processing
+10011 	| 1.0.0		| TODO		| IVR possibilities - Analysis
