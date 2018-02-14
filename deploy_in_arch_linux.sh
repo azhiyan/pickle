@@ -38,7 +38,7 @@ for pkg in {git,unzip,make,gcc,python2-virtualenv}; do
         echo -e "--> Package" $pkg "not installed :-(";
         exit 1;
     else
-	echo -e "--> Package" $pkg "installed and verified successfully :-).";
+        echo -e "--> Package" $pkg "installed and verified successfully :-).";
     fi;
 done
 echo -e "Dependency check after the installation... completed"
