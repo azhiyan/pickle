@@ -17,4 +17,4 @@ pip-selfcheck.json
 
 *.pyc
 
-core/configs/client.ini
+ini/client.ini
