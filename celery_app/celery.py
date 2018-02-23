@@ -38,21 +38,20 @@ class GeneralConsumerHelper(object):
 
     all_queues = get_queue_details()
 
+    def is_queue_durable(self):
 
-class LoggerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
+        return True if self.durable == 'durable_true' else False
 
-    def get_consumers(self, channel):
+    def create_queue(self):
 
-        _queue_name, _durable = self.__class__.all_queues['central_logger_queue']
-
-        _durable = True if _durable == 'durable_true' else False
-
-        queue = Queue(
-            name=_queue_name,
+        return Queue(
+            name=self.queue_name,
             exchange=Exchange(RMQ_EXCHANGE_NAME),
-            routing_key=_queue_name,
-            durable=_durable
+            routing_key=self.queue_name,
+            durable=self.durable
         )
+
+    def create_consumer(self, queue, channel):
 
         return [
             Consumer(
@@ -62,6 +61,32 @@ class LoggerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
                 accept=['json']
             )
         ]
+
+
+class SMSConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
+
+    def get_consumers(self, channel):
+
+        self.queue_name, self.durable = self.__class__.all_queues['central_sms_queue']
+
+        self.durable = self.is_queue_durable()
+
+        return self.create_consumer(self.create_queue(), channel)
+
+    def on_publish(self, body, message):
+        print 'Received message: {0!r}'.format(body)
+        message.ack()
+
+
+class LoggerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
+
+    def get_consumers(self, channel):
+
+        self.queue_name, self.durable = self.__class__.all_queues['central_logger_queue']
+
+        self.durable = self.is_queue_durable()
+
+        return self.create_consumer(self.create_queue(), channel)
 
     def on_publish(self, body, message):
         print 'Received message: {0!r}'.format(body)
@@ -72,25 +97,11 @@ class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
 
     def get_consumers(self, channel):
 
-        _queue_name, _durable = self.__class__.all_queues['scheduler_queue']
+        self.queue_name, self.durable = self.__class__.all_queues['scheduler_queue']
 
-        _durable = True if _durable == 'durable_true' else False
+        self.durable = self.is_queue_durable()
 
-        queue = Queue(
-            name=_queue_name,
-            exchange=Exchange(RMQ_EXCHANGE_NAME),
-            routing_key=_queue_name,
-            durable=_durable
-        )
-
-        return [
-            Consumer(
-                channel,
-                queues=[queue],
-                callbacks=[self.on_publish],
-                accept=['json']
-            )
-        ]
+        return self.create_consumer(self.create_queue(), channel)
 
     def on_publish(self, body, message):
         print 'Received message: {0!r}'.format(body)
@@ -99,6 +110,7 @@ class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
 
 application =  Celery('celery_app', broker='amqp://', backend='amqp://', include=['celery_app.tasks'])
 
+application.steps['consumer'].add(SMSConsumer)
 application.steps['consumer'].add(LoggerConsumer)
 application.steps['consumer'].add(SchedulerConsumer)
 
