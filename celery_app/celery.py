@@ -11,6 +11,8 @@
 
 # ----------- START: Native Imports ---------- #
 from __future__ import absolute_import, unicode_literals
+
+import json
 # ----------- END: Native Imports ---------- #
 
 # ----------- START: Third Party Imports ---------- #
@@ -59,7 +61,7 @@ class GeneralConsumerHelper(object):
             Consumer(
                 channel,
                 queues=[queue],
-                callbacks=[self.on_publish],
+                callbacks=[self.when_message_received],
                 accept=['json']
             )
         ]
@@ -75,7 +77,7 @@ class SMSConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
 
         return self.create_consumer(self.create_queue(), channel)
 
-    def on_publish(self, body, message):
+    def when_message_received(self, body, message):
         print 'Received message: {0!r}'.format(body)
         message.ack()
 
@@ -90,8 +92,17 @@ class LoggerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
 
         return self.create_consumer(self.create_queue(), channel)
 
-    def on_publish(self, body, message):
-        central_logger_api(body)
+    def when_message_received(self, body, message):
+        try:
+            body = json.loads(body)
+        except Exception as error:
+            central_logger_api(
+                data=body,
+                error='{}: {}'.format(error.__class__.__name__, str(error))
+            )
+        else:
+            central_logger_api(data=body)
+
         message.ack()
 
 
@@ -105,7 +116,7 @@ class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
 
         return self.create_consumer(self.create_queue(), channel)
 
-    def on_publish(self, body, message):
+    def when_message_received(self, body, message):
         print 'Received message: {0!r}'.format(body)
         message.ack()
 
