@@ -24,6 +24,8 @@ from core.utils.environ import (
     get_rabbitmq_details,
     get_queue_details
 )
+
+from core.logger.file_logger import central_logger_api
 # ----------- END: In-App Imports ---------- #
 
 __all__ = [
@@ -89,7 +91,7 @@ class LoggerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
         return self.create_consumer(self.create_queue(), channel)
 
     def on_publish(self, body, message):
-        print 'Received message: {0!r}'.format(body)
+        central_logger_api(body)
         message.ack()
 
 
@@ -108,43 +110,13 @@ class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
         message.ack()
 
 
-application =  Celery('celery_app', broker='amqp://', backend='amqp://', include=['celery_app.tasks'])
+application =  Celery(
+    'celery_app',
+    broker='amqp://',
+    backend='amqp://',
+    include=['celery_app.tasks']
+)
 
 application.steps['consumer'].add(SMSConsumer)
 application.steps['consumer'].add(LoggerConsumer)
 application.steps['consumer'].add(SchedulerConsumer)
-
-
-
-#queue_name = 't_q' #get_queue_details()['central_logger_queue'][0]
-#my_queue = Queue(queue_name, Exchange('exchange_a'), queue_name)
-#app = Celery(broker='amqp://')
-#
-#class MyConsumerStep(bootsteps.ConsumerStep):
-#
-#    def get_consumers(self, channel):
-#        return [Consumer(channel,
-#                         queues=[my_queue],
-#                         callbacks=[self.handle_message],
-#                         accept=['json'])]
-#
-#    def handle_message(self, body, message):
-#        print 'Received message: {0!r}'.format(body)
-#        message.ack()
-#
-#import pdb; pdb.set_trace() ## XXX: Remove This
-#app.steps['consumer'].add(MyConsumerStep)
-#
-#def send_me_a_message(who, producer=None):
-#    with app.producer_or_acquire(producer) as producer:
-#        producer.publish(
-#            {'hello': who},
-#            serializer='json',
-#            exchange=my_queue.exchange,
-#            routing_key=queue_name,
-#            declare=[my_queue],
-#            retry=True,
-#            virtual_host='/'
-#        )
-#
-#send_me_a_message('world!')

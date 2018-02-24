@@ -18,3 +18,5 @@ pip-selfcheck.json
 *.pyc
 
 ini/client.ini
+
+var/
