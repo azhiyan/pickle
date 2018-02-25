@@ -24,7 +24,8 @@ from kombu import Consumer, Exchange, Queue
 # ----------- START: In-App Imports ---------- #
 from core.utils.environ import (
     get_rabbitmq_details,
-    get_queue_details
+    get_queue_details,
+    get_amqp_connection_str
 )
 
 from core.logger.file_logger import central_logger_api
@@ -121,11 +122,13 @@ class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
         message.ack()
 
 
+con_str = get_amqp_connection_str()
+
 application =  Celery(
     'celery_app',
-    broker='amqp://',
-    backend='amqp://',
-    include=['celery_app.tasks']
+    broker=con_str,
+    backend=con_str,
+    include=[]
 )
 
 application.steps['consumer'].add(SMSConsumer)
