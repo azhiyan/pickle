@@ -12,7 +12,7 @@
 # ----------- START: Native Imports ---------- #
 from __future__ import absolute_import, unicode_literals
 
-import json
+import simplejson as json
 # ----------- END: Native Imports ---------- #
 
 # ----------- START: Third Party Imports ---------- #
@@ -29,6 +29,8 @@ from core.utils.environ import (
 )
 
 from core.logger.file_logger import central_logger_api
+
+from core.scheduler.scheduler import TaskScheduler
 # ----------- END: In-App Imports ---------- #
 
 __all__ = [
@@ -118,8 +120,31 @@ class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
         return self.create_consumer(self.create_queue(), channel)
 
     def when_message_received(self, body, message):
-        print 'Received message: {0!r}'.format(body)
-        message.ack()
+
+        scheduler = TaskScheduler()
+
+        if not scheduler.is_scheduler_running:
+            scheduler()
+
+        try:
+            if not isinstance(body, (str, unicode)):
+                raise Exception('message should be of type String, Got {}'.format(type(body)))
+
+            payload = json.loads(body)
+
+            if not isinstance(payload, dict):
+                raise TypeError('payload must be of type dict, Got'.format(type(payload)))
+
+            scheduler.process_job(payload)
+
+        except json.JSONDecodeError as error:
+            print 'CRITICAL ERROR: {}'.format(str(error))
+
+        except Exception as error:
+            print 'CRITICAL ERROR: {}'.format(str(error))
+
+        finally:
+            message.ack()
 
 
 con_str = get_amqp_connection_str()
