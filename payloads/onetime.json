@@ -1,0 +1,10 @@
+{
+    "schedule_type": "onetime",
+    "job_action": "add",
+    "start_date": {
+        "date": "2018-12-12",
+        "hour": 20,
+        "second": 10,
+        "minute": 10
+    }
+}

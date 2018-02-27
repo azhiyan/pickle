@@ -12,6 +12,7 @@
 # ----------- START: Native Imports ---------- #
 from __future__ import absolute_import, unicode_literals
 
+import ast
 import simplejson as json
 # ----------- END: Native Imports ---------- #
 
@@ -19,6 +20,9 @@ import simplejson as json
 from celery import Celery
 from celery import bootsteps
 from kombu import Consumer, Exchange, Queue
+
+from jsonschema import Draft4Validator
+from jsonschema.exceptions import ValidationError
 # ----------- END: Third Party Imports ---------- #
 
 # ----------- START: In-App Imports ---------- #
@@ -31,6 +35,8 @@ from core.utils.environ import (
 from core.logger.file_logger import central_logger_api
 
 from core.scheduler.scheduler import TaskScheduler
+
+from .schema import SCHEDULE_NEW_STRICT_SCHEMA
 # ----------- END: In-App Imports ---------- #
 
 __all__ = [
@@ -109,6 +115,49 @@ class LoggerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
         message.ack()
 
 
+DUMMY_SCHEMA = {
+    'type': 'object',
+    'additionalProperties': True,
+    'properties': dict()
+}
+
+
+def validate_payload(payload, schema=DUMMY_SCHEMA):
+
+    try:
+        if not isinstance(payload, (str, unicode)):
+            raise Exception('message should be of type String, Got {}'.format(type(payload)))
+
+        #
+        # ``ast.literal_eval`` converts a unicode object dict to python dict
+        # with keys and values as ``str``.
+        #
+        # >>> ast.literal_eval(u"{u'city': u'coimbatore', u'name': u'Plant'}")
+        # {u'city': u'coimbatore', u'name': u'Plant'}
+        payload = ast.literal_eval(payload)
+
+        if not isinstance(payload, dict):
+            raise TypeError('payload must be of type dict, Got'.format(type(payload)))
+
+        _errors = [error.message for error in Draft4Validator(schema).iter_errors(payload)]
+
+        if _errors:
+            _msg = 'ValidationError: {}'.format(_errors)
+            print _msg
+            raise ValidationError(_msg)
+
+    except json.JSONDecodeError as error:
+        print 'CRITICAL ERROR: {}'.format(str(error))
+
+    except Exception as error:
+        print 'CRITICAL ERROR: {}'.format(str(error))
+
+    else:
+        return payload
+
+    return False
+
+
 class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
 
     def get_consumers(self, channel):
@@ -119,32 +168,23 @@ class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
 
         return self.create_consumer(self.create_queue(), channel)
 
-    def when_message_received(self, body, message):
+    def when_message_received(self, payload, message):
 
-        scheduler = TaskScheduler()
+        payload = validate_payload(payload, SCHEDULE_NEW_STRICT_SCHEMA)
 
-        if not scheduler.is_scheduler_running:
-            scheduler()
+        if payload:
+            #
+            # Instanciate the Singleton TaskScheduler class.
+            scheduler = TaskScheduler()
 
-        try:
-            if not isinstance(body, (str, unicode)):
-                raise Exception('message should be of type String, Got {}'.format(type(body)))
-
-            payload = json.loads(body)
-
-            if not isinstance(payload, dict):
-                raise TypeError('payload must be of type dict, Got'.format(type(payload)))
+            #
+            # Start the scheduler if it's not in running state.
+            if not scheduler.is_scheduler_running:
+                scheduler()
 
             scheduler.process_job(payload)
 
-        except json.JSONDecodeError as error:
-            print 'CRITICAL ERROR: {}'.format(str(error))
-
-        except Exception as error:
-            print 'CRITICAL ERROR: {}'.format(str(error))
-
-        finally:
-            message.ack()
+        message.ack()
 
 
 con_str = get_amqp_connection_str()
