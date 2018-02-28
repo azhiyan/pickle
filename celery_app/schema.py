@@ -23,12 +23,22 @@ __all__ = [
 ]
 
 
+DUMMY_SCHEMA = {
+    'type': 'object',
+    'additionalProperties': True,
+    'properties': dict()
+}
+
+
 SCHEDULE_NEW_STRICT_SCHEMA = {
     'type': 'object',
     'additionalProperties': False,
 
     'properties': {
 
+        'job_id': {
+            'type': 'string'
+        },
         'schedule_type': {
             'type': 'string',
             'enum': ['onetime', 'daily', 'weekly']
@@ -71,7 +81,34 @@ SCHEDULE_NEW_STRICT_SCHEMA = {
             'required': ['date', 'hour', 'minute', 'second']
 
         },
-        'day_of_week': {
+        'delay_by': {
+
+            'type': 'object',
+
+            'properties': {
+
+                'hour': {
+                    'type': 'integer',
+                    'minimum': 0,
+                    'maximum': 23,
+                    'exclusiveMaximum': False
+                },
+                'minute': {
+                    'type': 'integer',
+                    'minimum': 0,
+                    'maximum': 59,
+                    'exclusiveMaximum': False
+                },
+                'second': {
+                    'type': 'integer',
+                    'minimum': 0,
+                    'maximum': 59,
+                    'exclusiveMaximum': False
+                }
+            },
+            'required': ['hour', 'minute', 'second']
+
+        },        'day_of_week': {
             'type': 'string'
         },
         'job_action': {
@@ -84,5 +121,5 @@ SCHEDULE_NEW_STRICT_SCHEMA = {
         }
     },
 
-    'required': ['schedule_type', 'job_action', 'start_date']
+    'required': ['schedule_type', 'job_action', 'start_date', 'job_id']
 }

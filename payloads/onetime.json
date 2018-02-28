@@ -1,4 +1,5 @@
 {
+    "job_id": "asdfg",
     "schedule_type": "onetime",
     "job_action": "add",
     "start_date": {
@@ -6,5 +7,10 @@
         "hour": 20,
         "second": 10,
         "minute": 10
+    },
+    "delay_by": {
+        "hour": 0,
+        "minute": 0,
+        "second": 59
     }
 }

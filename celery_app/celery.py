@@ -36,15 +36,49 @@ from core.logger.file_logger import central_logger_api
 
 from core.scheduler.scheduler import TaskScheduler
 
-from .schema import SCHEDULE_NEW_STRICT_SCHEMA
+from .schema import DUMMY_SCHEMA, SCHEDULE_NEW_STRICT_SCHEMA
 # ----------- END: In-App Imports ---------- #
+
 
 __all__ = [
     # All public symbols go here.
 ]
 
 
-RMQ_EXCHANGE_NAME = 'test_exchange'
+def validate_payload(payload, schema=DUMMY_SCHEMA):
+
+    try:
+        if not isinstance(payload, (str, unicode)):
+            raise Exception('message should be of type String, Got {}'.format(type(payload)))
+
+        #
+        # ``ast.literal_eval`` converts a unicode object dict to python dict
+        # with keys and values as ``str``.
+        #
+        # >>> ast.literal_eval(u"{u'city': u'coimbatore', u'name': u'Plant'}")
+        # {u'city': u'coimbatore', u'name': u'Plant'}
+        payload = ast.literal_eval(payload)
+
+        if not isinstance(payload, dict):
+            raise TypeError('payload must be of type dict, Got'.format(type(payload)))
+
+        _errors = [error.message for error in Draft4Validator(schema).iter_errors(payload)]
+
+        if _errors:
+            _msg = 'PayloadSchemaValidationError: {}'.format(_errors)
+            print _msg
+            raise ValidationError(_msg)
+
+    except json.JSONDecodeError as error:
+        print 'CRITICAL ERROR: {}'.format(str(error))
+
+    except Exception as error:
+        print 'CRITICAL ERROR: {}'.format(str(error))
+
+    else:
+        return payload
+
+    return False
 
 
 class GeneralConsumerHelper(object):
@@ -57,9 +91,11 @@ class GeneralConsumerHelper(object):
 
     def create_queue(self):
 
+        rmq = get_rabbitmq_details()
+
         return Queue(
             name=self.queue_name,
-            exchange=Exchange(RMQ_EXCHANGE_NAME),
+            exchange=Exchange(rmq['exchange']),
             routing_key=self.queue_name,
             durable=self.durable
         )
@@ -101,61 +137,15 @@ class LoggerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
 
         return self.create_consumer(self.create_queue(), channel)
 
-    def when_message_received(self, body, message):
-        try:
-            body = json.loads(body)
-        except Exception as error:
-            central_logger_api(
-                data=body,
-                error='{}: {}'.format(error.__class__.__name__, str(error))
-            )
-        else:
+    def when_message_received(self, payload, message):
+
+        payload = validate_payload(payload)
+
+        if payload:
             central_logger_api(data=body)
 
         message.ack()
 
-
-DUMMY_SCHEMA = {
-    'type': 'object',
-    'additionalProperties': True,
-    'properties': dict()
-}
-
-
-def validate_payload(payload, schema=DUMMY_SCHEMA):
-
-    try:
-        if not isinstance(payload, (str, unicode)):
-            raise Exception('message should be of type String, Got {}'.format(type(payload)))
-
-        #
-        # ``ast.literal_eval`` converts a unicode object dict to python dict
-        # with keys and values as ``str``.
-        #
-        # >>> ast.literal_eval(u"{u'city': u'coimbatore', u'name': u'Plant'}")
-        # {u'city': u'coimbatore', u'name': u'Plant'}
-        payload = ast.literal_eval(payload)
-
-        if not isinstance(payload, dict):
-            raise TypeError('payload must be of type dict, Got'.format(type(payload)))
-
-        _errors = [error.message for error in Draft4Validator(schema).iter_errors(payload)]
-
-        if _errors:
-            _msg = 'ValidationError: {}'.format(_errors)
-            print _msg
-            raise ValidationError(_msg)
-
-    except json.JSONDecodeError as error:
-        print 'CRITICAL ERROR: {}'.format(str(error))
-
-    except Exception as error:
-        print 'CRITICAL ERROR: {}'.format(str(error))
-
-    else:
-        return payload
-
-    return False
 
 
 class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
