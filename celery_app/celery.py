@@ -45,19 +45,27 @@ __all__ = [
 ]
 
 
+def byteify(input):
+    if isinstance(input, dict):
+        return {byteify(key): byteify(value)
+                for key, value in input.iteritems()}
+    elif isinstance(input, list):
+        return [byteify(element) for element in input]
+    elif isinstance(input, unicode):
+        return input.encode('utf-8')
+    else:
+        return input
+
+
 def validate_payload(payload, schema=DUMMY_SCHEMA):
 
     try:
         if not isinstance(payload, (str, unicode)):
             raise Exception('message should be of type String, Got {}'.format(type(payload)))
 
-        #
-        # ``ast.literal_eval`` converts a unicode object dict to python dict
-        # with keys and values as ``str``.
-        #
-        # >>> ast.literal_eval(u"{u'city': u'coimbatore', u'name': u'Plant'}")
-        # {u'city': u'coimbatore', u'name': u'Plant'}
-        payload = ast.literal_eval(payload)
+        payload = json.loads(payload)
+
+        payload = byteify(payload)
 
         if not isinstance(payload, dict):
             raise TypeError('payload must be of type dict, Got'.format(type(payload)))
@@ -66,14 +74,15 @@ def validate_payload(payload, schema=DUMMY_SCHEMA):
 
         if _errors:
             _msg = 'PayloadSchemaValidationError: {}'.format(_errors)
-            print _msg
             raise ValidationError(_msg)
 
     except json.JSONDecodeError as error:
-        print 'CRITICAL ERROR: {}'.format(str(error))
+        _error = 'While receiving payload {}, Got error: {}'
+        central_logger_api(data=payload, error=_error.format(payload, str(error)))
 
     except Exception as error:
-        print 'CRITICAL ERROR: {}'.format(str(error))
+        _error = 'While receiving payload {}, Got error: {}'
+        central_logger_api(data=payload, error=_error.format(payload, str(error)))
 
     else:
         return payload
@@ -84,10 +93,6 @@ def validate_payload(payload, schema=DUMMY_SCHEMA):
 class GeneralConsumerHelper(object):
 
     all_queues = get_queue_details()
-
-    def is_queue_durable(self):
-
-        return True if self.durable == 'durable_true' else False
 
     def create_queue(self):
 
@@ -118,8 +123,6 @@ class SMSConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
 
         self.queue_name, self.durable = self.__class__.all_queues['central_sms_queue']
 
-        self.durable = self.is_queue_durable()
-
         return self.create_consumer(self.create_queue(), channel)
 
     def when_message_received(self, body, message):
@@ -133,8 +136,6 @@ class LoggerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
 
         self.queue_name, self.durable = self.__class__.all_queues['central_logger_queue']
 
-        self.durable = self.is_queue_durable()
-
         return self.create_consumer(self.create_queue(), channel)
 
     def when_message_received(self, payload, message):
@@ -142,7 +143,7 @@ class LoggerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
         payload = validate_payload(payload)
 
         if payload:
-            central_logger_api(data=body)
+            central_logger_api(data=payload)
 
         message.ack()
 
@@ -153,8 +154,6 @@ class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
     def get_consumers(self, channel):
 
         self.queue_name, self.durable = self.__class__.all_queues['scheduler_queue']
-
-        self.durable = self.is_queue_durable()
 
         return self.create_consumer(self.create_queue(), channel)
 
