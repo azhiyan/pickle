@@ -63,9 +63,7 @@ def validate_payload(payload, schema=DUMMY_SCHEMA):
         if not isinstance(payload, (str, unicode)):
             raise Exception('message should be of type String, Got {}'.format(type(payload)))
 
-        payload = json.loads(payload)
-
-        payload = byteify(payload)
+        payload = byteify(json.loads(payload))
 
         if not isinstance(payload, dict):
             raise TypeError('payload must be of type dict, Got'.format(type(payload)))
