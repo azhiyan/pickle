@@ -37,6 +37,8 @@ from core.logger.file_logger import central_logger_api
 from core.scheduler.scheduler import TaskScheduler
 
 from .schema import DUMMY_SCHEMA, SCHEDULE_NEW_STRICT_SCHEMA
+
+from core.mq import SimplePublisher
 # ----------- END: In-App Imports ---------- #
 
 
@@ -169,7 +171,12 @@ class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
             if not scheduler.is_scheduler_running:
                 scheduler()
 
-            scheduler.process_job(payload)
+            result = scheduler.process_job(payload)
+
+            reply_to_queue = payload.get('reply_to_queue')
+
+            if reply_to_queue:
+                SimplePublisher().publish(reply_to_queue, json.dumps({'RESULT': result}))
 
         message.ack()
 

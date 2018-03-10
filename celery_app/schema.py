@@ -51,35 +51,8 @@ SCHEDULE_NEW_STRICT_SCHEMA = {
         },
         'start_date': {
 
-            'type': 'object',
-
-            'properties': {
-
-                'date': {
-                    'type': 'string',
-                    'pattern': '^[0-9]{4}-[0-9]{,2}-[0-9]{,2}$'
-                },
-                'hour': {
-                    'type': 'integer',
-                    'minimum': 0,
-                    'maximum': 23,
-                    'exclusiveMaximum': False
-                 },
-                'minute': {
-                    'type': 'integer',
-                    'minimum': 0,
-                    'maximum': 59,
-                    'exclusiveMaximum': False
-                },
-                'second': {
-                    'type': 'integer',
-                    'minimum': 0,
-                    'maximum': 59,
-                    'exclusiveMaximum': False
-                }
-            },
-            'required': ['date', 'hour', 'minute', 'second']
-
+            'type': 'string',
+            'pattern': '^[0-9]{4}-[0-9]{,2}-[0-9]{,2}(\s|T)[0-9]{,2}:[0-9]{,2}:[0-9]{,2}$'
         },
         'delay_by': {
 
@@ -108,7 +81,8 @@ SCHEDULE_NEW_STRICT_SCHEMA = {
             },
             'required': ['hour', 'minute', 'second']
 
-        },        'day_of_week': {
+        },
+        'day_of_week': {
             'type': 'string'
         },
         'job_action': {
@@ -118,6 +92,9 @@ SCHEDULE_NEW_STRICT_SCHEMA = {
         'emit_event': {
             'type': 'string',
             'enum': []
+        },
+        'reply_to_queue': {
+            'type': 'string'
         }
     },
 
