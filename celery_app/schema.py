@@ -98,5 +98,8 @@ SCHEDULE_NEW_STRICT_SCHEMA = {
         }
     },
 
-    'required': ['schedule_type', 'job_action', 'start_date', 'job_id']
+    "anyOf": [
+        {'required': ['job_action', 'job_id']},
+        {'required': ['schedule_type', 'job_action', 'start_date', 'job_id']}
+    ]
 }

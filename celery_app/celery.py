@@ -173,10 +173,12 @@ class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
 
             result = scheduler.process_job(payload)
 
+            print result
+
             reply_to_queue = payload.get('reply_to_queue')
 
             if reply_to_queue:
-                SimplePublisher().publish(reply_to_queue, json.dumps({'RESULT': result}))
+                SimplePublisher().publish(reply_to_queue, result)
 
         message.ack()
 
