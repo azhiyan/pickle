@@ -21,4 +21,4 @@ ini/client.ini
 ini/environments.ini
 
 var/
-data/
+.data/
