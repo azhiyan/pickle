@@ -44,10 +44,7 @@ SCHEDULE_NEW_STRICT_SCHEMA = {
             'enum': ['onetime', 'daily', 'weekly']
         },
         'recurrence': {
-            'type': 'integer',
-            'minimum': 0,
-            'maximum': 30,
-            'exclusiveMaximum': False
+            'type': 'string'
         },
         'start_date': {
 
