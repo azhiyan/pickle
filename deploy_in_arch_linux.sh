@@ -46,19 +46,19 @@ echo -e "Dependency check after the installation... completed"
 echo
 echo -e "setting up the virtualenv in " ${VIRTUAL_ENV_DIR} "... "
 echo
-su ${NORMAL_USER} -c "virtualenv2 --no-setuptools --no-pip --no-wheel ${VIRTUAL_ENV_DIR}"
-su ${NORMAL_USER} -c "./${VIRTUAL_ENV_DIR}/bin/python dependencies/ez_setup_38.4.0.py"
-su ${NORMAL_USER} -c "./${VIRTUAL_ENV_DIR}/bin/easy_install pip"
-su ${NORMAL_USER} -c "./${VIRTUAL_ENV_DIR}/bin/easy_install wheel"
+su ${NORMAL_USER} -c "virtualenv2 --never-download --no-setuptools --no-pip --no-wheel ${VIRTUAL_ENV_DIR}"
+su ${NORMAL_USER} -c "cd ${VIRTUAL_ENV_DIR}; ./bin/python dependencies/ez_setup_38.4.0.py"
+su ${NORMAL_USER} -c "cd ${VIRTUAL_ENV_DIR}; ./bin/easy_install pip"
+su ${NORMAL_USER} -c "cd ${VIRTUAL_ENV_DIR}; ./bin/easy_install wheel"
 
 echo
 echo -e "-------------------- Installing pip requirements ---------------------"
 echo
-su ${NORMAL_USER} -c "./${VIRTUAL_ENV_DIR}/bin/pip install -r requirements.txt"
+su ${NORMAL_USER} -c "cd ${VIRTUAL_ENV_DIR}; ./bin/pip install -r requirements.txt"
 echo
 echo -e "-------------------- Installing Buildout ---------------------"
 echo
-su ${NORMAL_USER} -c "./${VIRTUAL_ENV_DIR}/bin/buildout -c buildout.cfg"
+su ${NORMAL_USER} -c "cd ${VIRTUAL_ENV_DIR}; ./bin/buildout -c buildout.cfg"
 echo
 echo "===================== Deployment Completed Successfully ==================="
 
