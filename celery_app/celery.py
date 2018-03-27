@@ -39,6 +39,14 @@ from core.scheduler.scheduler import TaskScheduler
 from .schema import DUMMY_SCHEMA, SCHEDULE_NEW_STRICT_SCHEMA
 
 from core.mq import SimplePublisher
+
+from core.db.model import (
+    JobDetailsModel
+)
+
+from core.backend.utils.core_utils import (
+    AutoSession
+)
 # ----------- END: In-App Imports ---------- #
 
 
@@ -153,25 +161,44 @@ class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
 
     def get_consumers(self, channel):
 
+        #
+        # Instanciate the Singleton TaskScheduler class.
+        self.scheduler = TaskScheduler()
+
+        #
+        # Start the scheduler if it's not in running state.
+        if not self.scheduler.is_scheduler_running:
+            self.scheduler()
+
+            self.job_syncer()
+
         self.queue_name, self.durable = self.__class__.all_queues['scheduler_queue']
 
         return self.create_consumer(self.create_queue(), channel)
+
+    def job_syncer(self):
+
+        scheduled_jobs = list()
+
+        with AutoSession() as session:
+
+            scheduled_jobs = JobDetailsModel.scheduled_jobs(
+                session, data_as_dict=True
+            )
+
+        #self.scheduler.remove_all_jobs()
+
+        for each_job in scheduled_jobs:
+            each_job['job_action'] = 'add'
+            if each_job['schedule_type'].lower() == 'onetime':
+                self.scheduler.process_job(payload=each_job)
 
     def when_message_received(self, payload, message):
 
         payload = validate_payload(payload, SCHEDULE_NEW_STRICT_SCHEMA)
 
         if payload:
-            #
-            # Instanciate the Singleton TaskScheduler class.
-            scheduler = TaskScheduler()
-
-            #
-            # Start the scheduler if it's not in running state.
-            if not scheduler.is_scheduler_running:
-                scheduler()
-
-            result = scheduler.process_job(payload)
+            result = self.scheduler.process_job(payload)
 
             print result
 
