@@ -186,12 +186,16 @@ class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
                 session, data_as_dict=True
             )
 
+        # TODO: move inside scheduler
         #self.scheduler.remove_all_jobs()
 
         for each_job in scheduled_jobs:
             each_job['job_action'] = 'add'
-            if each_job['schedule_type'].lower() == 'onetime':
+            try:
                 self.scheduler.process_job(payload=each_job)
+            except:
+                # TODO: revisit
+                pass
 
     def when_message_received(self, payload, message):
 
