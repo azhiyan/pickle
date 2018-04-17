@@ -21,7 +21,7 @@ echo -e "------------------------ Installing Dependencies ----------------------
 
 echo -e "------------------------ Installing Dependencies -------------------------"
 
-PACKAGES="git vim tmux wget unzip make gcc python-virtualenv sqlite sqlite-devel"
+PACKAGES="git vim tmux wget unzip make gcc sqlite sqlite-devel openssl openssl-devel"
 
 for pkg in ${PACKAGES};
 do
