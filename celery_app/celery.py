@@ -183,11 +183,7 @@ class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
         with AutoSession() as session:
 
             scheduled_jobs = JobDetailsModel.scheduled_jobs(
-                session,
-                data_as_dict=True,
-                #
-                # schedule_type should be `select one` as to avoid the cartessian join.
-                schedule_type='select one'
+                session, data_as_dict=True
             )
 
         # TODO: move inside scheduler
