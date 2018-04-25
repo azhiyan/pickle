@@ -1,36 +1,32 @@
 #!/bin/sh
 
-echo -e "------------------------ Updating Kernel -------------------------"
-
-echo -ne "Checking the current user permissions... "
+echo "------------------------ Updating Kernel -------------------------"
+echo "Checking the current user permissions... "
 if ! [ $(id -u) = 0 ]; then
    echo "Permission denied !"
    echo
    echo "CRITICAL: This script must be run as root"
    exit 1
-else
-   echo "User, approved"
 fi
+echo "\n\n"
 
-echo -ne "updating the kernel with yum package manager... "
-apt-get update -y >| /dev/null
-echo -e "completed"
+echo "------------------------ Updating Kernel -------------------------"
+apt-get update -y
+echo "\n\n"
 
+echo "------------------------ Installing Dependencies -------------------------"
 
-echo -e "------------------------ Installing Dependencies -------------------------"
-
-echo -e "------------------------ Installing Dependencies -------------------------"
-
-PACKAGES="git vim tmux wget unzip make gcc gcc-c++ glibc-devel sqlite sqlite-devel epel-release openssl openssl-devel ncurses-devel autoconf rpm-build"
+PACKAGES="wget git vim tmux gcc build-essential unzip make libncurses5-dev libncursesw5-dev sqlite sqlite3 libsqlite3-dev"
 
 for pkg in ${PACKAGES};
 do
-    rpm -q $pkg >| /dev/null;
+    #apt -qq list $pkg >| /dev/null;
+    dpkg -l | awk -F' ' '{print $2}' | grep -i $pkg >| /dev/null;
     if ! [ $? = 0 ]; then
-        echo -ne "--> Installing package " $pkg "... ";
+        echo -n "--> Installing package " $pkg "... ";
         apt-get install -y $pkg >| /dev/null
-        echo -e "Completed"
+        echo "Completed"
     else
-        echo -e "--> Package" $pkg " is already installed.";
+        echo "--> Package" $pkg " is already installed.";
     fi;
 done
