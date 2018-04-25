@@ -23,6 +23,7 @@ PACKAGES="wget git vim tmux gcc build-essential unzip make libncurses5-dev libnc
 for pkg in ${PACKAGES};
 do
     apt-get install -y $pkg
+    echo "---"
 done
 
 
@@ -30,7 +31,10 @@ echo
 echo "------------------------ Post Installation Checks -------------------------"
 for pkg in ${PACKAGES};
 do
-    echo -n "Checking the package " $pkg " ... "
-    dpkg -l | awk -v pkg=$pkg -v status="ii" -F' ' '($2 == pkg) {print}' | awk -F' ' '{if($1 == "ii") {print "SUCCESS"} else {print "FAILED"}}';
-    echo
+    echo -n "Verifying the package (with version): "
+    dpkg-query -W $pkg
 done
+
+echo
+echo "------------------------ Dependency Installations Complete --------------------------"
+echo
