@@ -20,8 +20,7 @@ PACKAGES="wget git vim tmux gcc build-essential unzip make libncurses5-dev libnc
 
 for pkg in ${PACKAGES};
 do
-    #apt -qq list $pkg >| /dev/null;
-    dpkg -l | awk -F' ' '{print $2}' | grep -i $pkg >| /dev/null;
+    dpkg -l | awk '$1 == "ii" {print $2}' | grep -i $pkg >| /dev/null;
     if ! [ $? = 0 ]; then
         echo -n "--> Installing package " $pkg "... ";
         apt-get install -y $pkg >| /dev/null
