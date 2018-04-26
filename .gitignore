@@ -22,3 +22,7 @@ ini/environments.ini
 
 var/
 .data/
+
+nohup.out
+uWSGI.py
+
