@@ -9,8 +9,8 @@ if [ $1 = "start" ]; then
     echo "START"
     for port in ${config:app_ports};
     do
-        echo -n "Spawnning Server on port" $port
-        nohup /home/pi/b1/bin/run_app --port $port >| /dev/null &
+        echo -n "Spawnning Server on port" $port ":: "
+        nohup ${buildout:bin-directory}/run_app --port $port >| /dev/null &
 	sleep 5
     done;
 
