@@ -1,0 +1,25 @@
+#! /bin/sh
+
+if [ $# -ne 1 ]; then
+    echo "usage: ./bin/./run_app.sh [start|stop]"
+    exit 1
+fi
+
+if [ $1 = "start" ]; then
+    echo "START"
+    for port in ${config:app_ports};
+    do
+        echo -n "Spawnning Server on port" $port
+        nohup /home/pi/b1/bin/run_app --port $port >| /dev/null &
+	sleep 5
+    done;
+
+elif [ $1 = "stop" ]; then
+    ps -aux | grep run_app | awk -F' ' '{print $2}' | xargs kill -9 >| /dev/null
+    echo "Successfully stopped the instances."
+
+else
+    echo "usage: ./bin/./run_app.sh [start|stop]"
+    exit 1
+fi
+
