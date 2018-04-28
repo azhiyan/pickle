@@ -45,14 +45,16 @@ echo
 
 echo
 echo "------------------------ Configuring NGINX: STARTED --------------------------"
+/etc/init.d/nginx stop
+sleep 2
+
 rm -rvf /etc/nginx-config-backup
 mv -v /etc/nginx/ /etc/nginx-config-backup
 mkdir /etc/nginx/
 
 cp -fv ${BUILD_DIR}/cfg/nginx.conf /etc/nginx/
 
-/etc/init.d/nginx stop
-sleep 2
 /etc/init.d/nginx start
+sleep 2
 echo "------------------------ Configuring NGINX: COMPLETED --------------------------"
 echo
