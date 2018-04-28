@@ -1,5 +1,9 @@
 #!/bin/sh
 
+BUILD_DIR=`pwd`
+
+echo ${BUILD_DIR}
+
 echo "------------------------ Updating Kernel -------------------------"
 echo "Checking the current user permissions... "
 if ! [ $(id -u) = 0 ]; then
@@ -18,7 +22,7 @@ echo
 
 echo "------------------------ Installing Dependencies -------------------------"
 
-PACKAGES="wget git vim tmux gcc build-essential unzip make libncurses5-dev libncursesw5-dev sqlite sqlite3 libsqlite3-dev openssl libssl-dev python-dev"
+PACKAGES="wget git vim tmux gcc build-essential unzip make libncurses5-dev libncursesw5-dev sqlite sqlite3 libsqlite3-dev openssl libssl-dev python-dev nginx"
 
 for pkg in ${PACKAGES};
 do
@@ -37,4 +41,18 @@ done
 
 echo
 echo "------------------------ Dependency Installations Complete --------------------------"
+echo
+
+echo
+echo "------------------------ Configuring NGINX: STARTED --------------------------"
+rm -rvf /etc/nginx-config-backup
+mv -v /etc/nginx/ /etc/nginx-config-backup
+mkdir /etc/nginx/
+
+cp -fv ${BUILD_DIR}/cfg/nginx.conf /etc/nginx/
+
+/etc/init.d/nginx stop
+sleep 2
+/etc/init.d/nginx start
+echo "------------------------ Configuring NGINX: COMPLETED --------------------------"
 echo
