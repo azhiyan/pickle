@@ -9,14 +9,11 @@ events {
 http {
 
         upstream app {
-          server 127.0.0.1:5001;
-          server 127.0.0.1:5002;
-          server 127.0.0.1:5003;
-          server 127.0.0.1:5004;
+          ${config:nginx-instance-nodes}
         }
 
         server {
-          listen 80;
+          listen ${config:nginx-listen-port};
 
           location / {
             proxy_pass  http://app;
