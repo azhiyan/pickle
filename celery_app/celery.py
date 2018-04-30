@@ -47,6 +47,8 @@ from core.db.model import (
 from core.backend.utils.core_utils import (
     AutoSession
 )
+
+from core.sms.client import SendSMS
 # ----------- END: In-App Imports ---------- #
 
 
@@ -135,6 +137,7 @@ class SMSConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
 
     def when_message_received(self, body, message):
         print 'Received message: {0!r}'.format(body)
+        SendSMS('/dev/ttyS0').send('fsdafsdafdas', "9742398830")
         message.ack()
 
 
@@ -199,6 +202,7 @@ class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
 
     def when_message_received(self, payload, message):
 
+        SendSMS('/dev/ttyS0').send('fsdafsdafdas', "9742398830")
         payload = validate_payload(payload, SCHEDULE_NEW_STRICT_SCHEMA)
 
         if payload:

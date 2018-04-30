@@ -22,7 +22,7 @@ echo
 
 echo "------------------------ Installing Dependencies -------------------------"
 
-PACKAGES="wget git vim tmux gcc build-essential unzip make libncurses5-dev libncursesw5-dev sqlite sqlite3 libsqlite3-dev openssl libssl-dev python-dev nginx"
+PACKAGES="wget git vim tmux gcc build-essential unzip make libncurses5-dev libncursesw5-dev sqlite sqlite3 libsqlite3-dev openssl libssl-dev python-dev nginx erlang logrotate"
 
 for pkg in ${PACKAGES};
 do
