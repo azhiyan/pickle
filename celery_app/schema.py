@@ -39,6 +39,9 @@ SCHEDULE_NEW_STRICT_SCHEMA = {
         "job_id": {
             "type": "string"
         },
+        "user_id": {
+            "type": "integer"
+        },
         "schedule_type": {
             "type": "string",
             "enum": ["onetime", "daily", "weekly"]
@@ -115,10 +118,7 @@ SEND_SMS_STRICT_SCHEMA = {
             "type": "string",
             "pattern": "^[0-9]{10}$"
         },
-        "user_name": {
-            "type": "string",
-        },
 
-        "required": ["message", "number", "user_name"]
+        "required": ["message", "number"]
         }
 }
