@@ -27,6 +27,7 @@ from jsonschema.exceptions import ValidationError
 
 # ----------- START: In-App Imports ---------- #
 from core.utils.environ import (
+    get_sim_details,
     get_rabbitmq_details,
     get_queue_details,
     get_amqp_connection_str
@@ -36,7 +37,7 @@ from core.logger.file_logger import central_logger_api
 
 from core.scheduler.scheduler import TaskScheduler
 
-from .schema import DUMMY_SCHEMA, SCHEDULE_NEW_STRICT_SCHEMA
+from .schema import DUMMY_SCHEMA, SCHEDULE_NEW_STRICT_SCHEMA, SEND_SMS_STRICT_SCHEMA
 
 from core.mq import SimplePublisher
 
@@ -47,6 +48,8 @@ from core.db.model import (
 from core.backend.utils.core_utils import (
     AutoSession
 )
+
+from core.sms.client import SendSMS
 # ----------- END: In-App Imports ---------- #
 
 
@@ -129,12 +132,23 @@ class SMSConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
 
     def get_consumers(self, channel):
 
+        self.sim_details = get_sim_details()
+
         self.queue_name, self.durable = self.__class__.all_queues['central_sms_queue']
 
         return self.create_consumer(self.create_queue(), channel)
 
-    def when_message_received(self, body, message):
-        print 'Received message: {0!r}'.format(body)
+    def when_message_received(self, payload, message):
+
+        payload = validate_payload(payload, SEND_SMS_STRICT_SCHEMA)
+
+        if payload:
+            sms_client = SendSMS(self.sim_details['serial_port'])
+            result, response_msg = sms_client.send(
+                message=payload['message'],
+                recipient=payload['number']
+            )
+
         message.ack()
 
 

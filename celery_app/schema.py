@@ -24,79 +24,101 @@ __all__ = [
 
 
 DUMMY_SCHEMA = {
-    'type': 'object',
-    'additionalProperties': True,
-    'properties': dict()
+    "type": "object",
+    "additionalProperties": True,
+    "properties": dict()
 }
 
 
 SCHEDULE_NEW_STRICT_SCHEMA = {
-    'type': 'object',
-    'additionalProperties': False,
+    "type": "object",
+    "additionalProperties": False,
 
-    'properties': {
+    "properties": {
 
-        'job_id': {
-            'type': 'string'
+        "job_id": {
+            "type": "string"
         },
-        'schedule_type': {
-            'type': 'string',
-            'enum': ['onetime', 'daily', 'weekly']
+        "schedule_type": {
+            "type": "string",
+            "enum": ["onetime", "daily", "weekly"]
         },
-        'recurrence': {
-            'type': 'string'
+        "recurrence": {
+            "type": "string"
         },
-        'start_date': {
+        "start_date": {
 
-            'type': 'string',
-            'pattern': '^[0-9]{4}-[0-9]{,2}-[0-9]{,2}(\s|T)[0-9]{,2}:[0-9]{,2}:[0-9]{,2}$'
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{,2}-[0-9]{,2}(\s|T)[0-9]{,2}:[0-9]{,2}:[0-9]{,2}$"
         },
-        'delay_by': {
+        "delay_by": {
 
-            'type': 'object',
+            "type": "object",
 
-            'properties': {
+            "properties": {
 
-                'hour': {
-                    'type': 'integer',
-                    'minimum': 0,
-                    'maximum': 23,
-                    'exclusiveMaximum': False
+                "hour": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 23,
+                    "exclusiveMaximum": False
                 },
-                'minute': {
-                    'type': 'integer',
-                    'minimum': 0,
-                    'maximum': 59,
-                    'exclusiveMaximum': False
+                "minute": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 59,
+                    "exclusiveMaximum": False
                 },
-                'second': {
-                    'type': 'integer',
-                    'minimum': 0,
-                    'maximum': 59,
-                    'exclusiveMaximum': False
+                "second": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 59,
+                    "exclusiveMaximum": False
                 }
             },
-            'required': ['hour', 'minute', 'second']
+            "required": ["hour", "minute", "second"]
 
         },
-        'day_of_week': {
-            'type': 'string'
+        "day_of_week": {
+            "type": "string"
         },
-        'job_action': {
-            'type': 'string',
-            'enum': ['add', 'update', 'remove']
+        "job_action": {
+            "type": "string",
+            "enum": ["add", "update", "remove"]
         },
-        'emit_event': {
-            'type': 'string',
-            'enum': []
+        "emit_event": {
+            "type": "string",
+            "enum": []
         },
-        'reply_to_queue': {
-            'type': 'string'
+        "reply_to_queue": {
+            "type": "string"
         }
     },
 
     "anyOf": [
-        {'required': ['job_action', 'job_id']},
-        {'required': ['schedule_type', 'job_action', 'start_date', 'job_id']}
+        {"required": ["job_action", "job_id"]},
+        {"required": ["schedule_type", "job_action", "start_date", "job_id"]}
     ]
+}
+
+
+SEND_SMS_STRICT_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+
+    "properties": {
+
+        "message": {
+            "type": "string"
+        },
+        "number": {
+            "type": "string",
+            "pattern": "^[0-9]{10}$"
+        },
+        "user_name": {
+            "type": "string",
+        },
+
+        "required": ["message", "number", "user_name"]
+        }
 }

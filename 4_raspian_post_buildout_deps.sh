@@ -30,3 +30,10 @@ cp -fv ${BUILD_DIR}/cfg/nginx.conf /etc/nginx/
 sleep 2
 echo "------------------------ Configuring NGINX: COMPLETED --------------------------"
 echo
+
+
+rabbitmqctl add_user test test
+rabbitmqctl authenticate_user test test
+rabbitmqctl list_users
+rabbitmqctl  set_user_tags test administrator
+rabbitmqctl list_users
