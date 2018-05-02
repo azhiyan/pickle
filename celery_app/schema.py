@@ -39,7 +39,7 @@ SCHEDULE_NEW_STRICT_SCHEMA = {
         "job_id": {
             "type": "string"
         },
-        "user_id": {
+        "user_idn": {
             "type": "integer"
         },
         "schedule_type": {

@@ -39,8 +39,6 @@ from core.scheduler.scheduler import TaskScheduler
 
 from .schema import DUMMY_SCHEMA, SCHEDULE_NEW_STRICT_SCHEMA, SEND_SMS_STRICT_SCHEMA
 
-from core.mq import SimplePublisher
-
 from core.db.model import (
     JobDetailsModel
 )
@@ -200,9 +198,6 @@ class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
                 session, data_as_dict=True
             )
 
-        # TODO: move inside scheduler
-        #self.scheduler.remove_all_jobs()
-
         for each_job in scheduled_jobs:
             each_job['job_action'] = 'add'
             try:
@@ -217,13 +212,6 @@ class SchedulerConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
 
         if payload:
             result = self.scheduler.process_job(payload)
-
-            print result
-
-            reply_to_queue = payload.get('reply_to_queue')
-
-            if reply_to_queue:
-                SimplePublisher().publish(reply_to_queue, result)
 
         message.ack()
 
