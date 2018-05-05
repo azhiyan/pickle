@@ -40,7 +40,7 @@ from core.scheduler.scheduler import TaskScheduler
 from .schema import DUMMY_SCHEMA, SCHEDULE_NEW_STRICT_SCHEMA, SEND_SMS_STRICT_SCHEMA
 
 from core.db.model import (
-    JobDetailsModel
+    JobDetailsModel, TransSmsModel, UserModel
 )
 
 from core.backend.utils.core_utils import (
@@ -146,6 +146,14 @@ class SMSConsumer(bootsteps.ConsumerStep, GeneralConsumerHelper):
                 message=payload['message'],
                 recipient=payload['number']
             )
+
+            if not result:
+                with AutoSession() as session:
+                    user_data = UserModel.fetch_one(session, phone_no1=payload['number'])
+                    TransSmsModel.insert(session, 
+                        user_idn=user_data.user_idn, 
+                        message=payload['message']
+                    )
 
         message.ack()
 
