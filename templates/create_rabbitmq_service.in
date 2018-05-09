@@ -1,0 +1,26 @@
+#!/bin/bash
+
+
+echo "Checking the current user permissions... "
+if ! [ $(id -u) = 0 ]; then
+   echo "Permission denied !"
+   echo
+   echo "CRITICAL: This script must be run as root"
+   exit 1
+fi
+echo
+echo
+
+if [ -f ./bin/rabbitmq.service ]; then 
+   echo "Configuring systemd"
+   cp ./bin/rabbitmq.service /lib/systemd/system/
+   chmod 644 /lib/systemd/system/rabbitmq.service
+   systemctl daemon-reload
+   systemctl enable rabbitmq.service
+   systemctl start rabbitmq.service
+   sleep 10
+   systemctl status rabbitmq.service
+else
+   echo "Service ecript bin/rabbitmq.service not available!"
+fi
+echo
